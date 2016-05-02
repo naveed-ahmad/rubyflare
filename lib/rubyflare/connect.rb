@@ -13,12 +13,19 @@ module Rubyflare
     %i(get post put patch delete).each do |method_name|
       define_method(method_name) do |endpoint, options = {}|
         options = options.to_json unless method_name == :get
-        response = Curl.send(method_name, API_URL + endpoint, options) do |http|
-          http.headers['X-Auth-Email'] = @email
-          http.headers['X-Auth-Key'] = @api_key
-          http.headers['Content-Type'] = 'application/json'
-        end
-        @response = Rubyflare::Response.new(method_name, endpoint, response.body_str)
+
+        headers = {}
+        response = RestClient.send(method_name, API_URL + endpoint, options, request_headers)
+
+        @response = Rubyflare::Response.new(method_name, endpoint, response)
+      end
+    end
+
+    def request_headers
+      Hash.new.tap do |headers|
+        headers['X-Auth-Email'] = @email
+        headers['X-Auth-Key'] = @api_key
+        headers['Content-Type'] = 'application/json'
       end
     end
   end
