@@ -12,11 +12,13 @@ module Rubyflare
     
     %i(get post put patch delete).each do |method_name|
       define_method(method_name) do |endpoint, options = {}|
-        options = options.to_json unless method_name == :get
-
-        headers = {}
-        response = RestClient.send(method_name, API_URL + endpoint, options, request_headers)
-
+        response= if method_name == :get
+                    RestClient.get(API_URL + endpoint, request_headers)
+                  else
+                    options = options.to_json unless method_name == :get
+                    RestClient.send(method_name, API_URL + endpoint, options, request_headers)
+                  end
+        
         @response = Rubyflare::Response.new(method_name, endpoint, response)
       end
     end
