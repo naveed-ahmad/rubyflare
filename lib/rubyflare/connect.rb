@@ -16,7 +16,9 @@ module Rubyflare
                     RestClient.get(API_URL + endpoint, request_headers)
                   else
                     options = options.to_json unless method_name == :get
-                    RestClient.send(method_name, API_URL + endpoint, options, request_headers)
+                    #RestClient.send(method_name, API_URL + endpoint, options, request_headers)
+                    RestClient::Request.execute(method: method_name, url: API_URL + endpoint,
+                            payload: options, headers: request_headers)
                   end
         
         @response = Rubyflare::Response.new(method_name, endpoint, response)
